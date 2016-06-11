@@ -26,6 +26,6 @@
       fab:fab_type="normal"
       fab:layout_anchor="recycler_view"
       fab:layout_anchorGravity="bottom | end"
-      android:contentDescription="@string/description_add_a_stock"
+      android:contentDescription="@string/desc_add_a_stock"
       />
 </FrameLayout>

@@ -1,0 +1,18 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="action_example">العمل سبيل المثال</string>
+
+  <string name="action_settings">إعدادات</string>
+  <string name="action_change_units">وحدات التغيير</string>
+  <string name="symbol_search">رمز البحث</string>
+  <string name="content_test">بحث عن الأوراق المالية رمز</string>
+  <string name="network_toast">اه أوه! هذا التطبيق يتطلب اتصال بالإنترنت</string>
+  <string name="stock_already_saved">يتم حفظ هذه الأسهم بالفعل!</string>
+
+
+  <!--  Description for screen reader-->
+  <string name="desc_add_a_stock">إضافة الأسهم</string>
+  <string name="desc_stock">الأسهم رمز<xliff:g id="symbol">%1$s</xliff:g></string>
+  <string name="desc_stock_price">الأسهم سعر العرض<xliff:g id="bid_price">%1$s</xliff:g></string>
+  <string name="desc_stock_change">السهم<xliff:g id="change">%1$s</xliff:g></string>
+  <string name="desc_stock_percent_change">الأسهم نسبة التغيير<xliff:g id="percent_change">%1$s</xliff:g></string>
+</resources>

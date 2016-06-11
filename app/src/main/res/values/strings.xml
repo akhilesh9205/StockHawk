@@ -1,5 +1,5 @@
-<resources>
-  <string name="app_name">Stock Hawk</string>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="app_name" translatable="false">Stock Hawk</string>
 
   <string name="action_example">Example action</string>
 
@@ -7,8 +7,16 @@
   <string name="action_change_units">Change Units</string>
   <string name="symbol_search">Symbol Search</string>
   <string name="content_test">Search for a Stock Symbol</string>
-  <string name="input_hint">FB</string>
+  <string name="input_hint" translatable="false">FB</string>
   <string name="input_prefill"></string>
   <string name="network_toast">Uh-oh! This app requires an internet connection</string>
-  <string name="description_add_a_stock">Add a stock</string>
+  <string name="stock_already_saved">This stock is already saved!</string>
+
+
+  <!--  Description for screen reader-->
+  <string name="desc_add_a_stock">Add a stock</string>
+  <string name="desc_stock">Stock Symbol <xliff:g id="symbol">%1$s</xliff:g></string>
+  <string name="desc_stock_price">Stock Bid Price <xliff:g id="bid_price">%1$s</xliff:g></string>
+  <string name="desc_stock_change">Stock Change <xliff:g id="change">%1$s</xliff:g></string>
+  <string name="desc_stock_percent_change">Stock Percent Change <xliff:g id="percent_change">%1$s</xliff:g></string>
 </resources>
