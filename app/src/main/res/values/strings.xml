@@ -19,4 +19,7 @@
   <string name="desc_stock_price">Stock Bid Price <xliff:g id="bid_price">%1$s</xliff:g></string>
   <string name="desc_stock_change">Stock Change <xliff:g id="change">%1$s</xliff:g></string>
   <string name="desc_stock_percent_change">Stock Percent Change <xliff:g id="percent_change">%1$s</xliff:g></string>
+  <string name="invalid_stock">Invalid Stock</string>
+  <string name="not_found">Not found</string>
+  <string name="ok">OK</string>
 </resources>

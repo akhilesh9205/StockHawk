@@ -1,13 +1,16 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -20,6 +23,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
@@ -41,6 +46,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
    * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
    */
 
+  private static final String INTENT_ACTION_STOCK_NOT_FOUND = "com.sam_chordas.STOCK_NOT_AVAILABLE";
+
+
   /**
    * Used to store the last screen title. For use in {@link #restoreActionBar()}.
    */
@@ -52,6 +60,21 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private Context mContext;
   private Cursor mCursor;
   boolean isConnected;
+
+  private BroadcastReceiver mStockNotFoundReceiver=new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      String symbol = intent.getStringExtra("symbol");
+      new MaterialDialog.Builder(mContext).title(R.string.not_found)
+              .content(getString(R.string.invalid_stock) + " : " + symbol).positiveText(R.string.ok)
+              .onPositive(new MaterialDialog.SingleButtonCallback() {
+                @Override
+                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                  dialog.dismiss();
+                }
+              }).show();
+    }
+  };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +178,18 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     }
   }
 
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    registerReceiver(mStockNotFoundReceiver, new IntentFilter(INTENT_ACTION_STOCK_NOT_FOUND));
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    unregisterReceiver(mStockNotFoundReceiver);
+  }
 
   @Override
   public void onResume() {
