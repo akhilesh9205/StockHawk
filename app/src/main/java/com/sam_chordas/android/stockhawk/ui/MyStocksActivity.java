@@ -22,6 +22,8 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -53,10 +55,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
    * Used to store the last screen title. For use in {@link #restoreActionBar()}.
    */
   private CharSequence mTitle;
-  private Intent mServiceIntent;
-  private ItemTouchHelper mItemTouchHelper;
   private static final int CURSOR_LOADER_ID = 0;
   private QuoteCursorAdapter mCursorAdapter;
+  private Intent mServiceIntent;
+  private ItemTouchHelper mItemTouchHelper;
+  private RecyclerView recyclerView;
+  private TextView mEmptyTextView;
+  private ProgressBar mEmptyProgressbar;
   private Context mContext;
   private Cursor mCursor;
   boolean isConnected;
@@ -99,7 +104,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         networkToast();
       }
     }
-    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+    mEmptyTextView = (TextView) findViewById(R.id.empty_text);
+    mEmptyProgressbar = (ProgressBar) findViewById(R.id.empty_progressbar);
+    mEmptyProgressbar.setVisibility(View.VISIBLE);
+
+
+    recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
@@ -126,16 +137,21 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 @Override public void onInput(MaterialDialog dialog, CharSequence input) {
                   // On FAB click, receive user input. Make sure the stock doesn't already exist
                   // in the DB and proceed accordingly
+                  String symbol = input.toString();
+                  if (symbol.isEmpty()) {
+                    return;
+                  }
+
                   Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
                       new String[] { QuoteColumns.SYMBOL }, QuoteColumns.SYMBOL + "= ?",
-                      new String[] { input.toString() }, null);
-                  if (c.getCount() != 0) {
+                      new String[] { symbol }, null);
+                  if (c != null && c.getCount() != 0) {
+                    c.close();
                     Toast toast =
-                        Toast.makeText(MyStocksActivity.this, R.string.stock_already_saved,
-                            Toast.LENGTH_LONG);
+                            Toast.makeText(MyStocksActivity.this, R.string.stock_already_saved,
+                                    Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                     toast.show();
-                    return;
                   } else {
                     // Add the stock to DB
                     mServiceIntent.putExtra("tag", "add");
@@ -238,6 +254,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args){
+    mEmptyTextView.setVisibility(View.GONE);
+    mEmptyProgressbar.setVisibility(View.VISIBLE);
+
     // This narrows the return to only the stocks that are most current.
     return new CursorLoader(this, QuoteProvider.Quotes.CONTENT_URI,
         new String[]{ QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE,
@@ -251,6 +270,19 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   public void onLoadFinished(Loader<Cursor> loader, Cursor data){
     mCursorAdapter.swapCursor(data);
     mCursor = data;
+
+    if (mCursorAdapter.getItemCount() <= 0) {
+      mEmptyTextView.setVisibility(View.VISIBLE);
+      mEmptyTextView.setText(R.string.press_to_add_new_stock);
+    }else{
+      mEmptyTextView.setVisibility(View.GONE);
+    }
+    mEmptyProgressbar.setVisibility(View.GONE);
+
+
+    if (!isConnected && mCursorAdapter.getItemCount() > 0) {
+      Toast.makeText(this, R.string.no_network_stock_outofdate, Toast.LENGTH_SHORT).show();
+    }
   }
 
   @Override
