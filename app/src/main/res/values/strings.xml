@@ -28,4 +28,8 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="title_activity_detail_graph">DetailGraphActivity</string>
+    <string name="stock_name">Stock Name</string>
+    <string name="stock_symbol">Stock Smbol</string>
+    <string name="change">Change</string>
+    <string name="percent_change">Percent change</string>
 </resources>
