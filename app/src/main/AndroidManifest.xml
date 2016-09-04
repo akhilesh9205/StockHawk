@@ -20,7 +20,8 @@
 
         <activity
             android:name=".ui.MyStocksActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,7 +60,9 @@
 
         <activity
             android:name=".ui.DetailGraphActivity"
-            android:label="@string/title_activity_detail_graph"></activity>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".ui.MyStocksActivity"
+            android:label="@string/title_activity_detail_graph"/>
     </application>
 
 </manifest>

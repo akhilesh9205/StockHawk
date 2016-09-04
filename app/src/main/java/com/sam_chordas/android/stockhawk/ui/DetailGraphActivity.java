@@ -1,14 +1,26 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.Activity;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.data.QuoteColumns;
+import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -38,8 +50,9 @@ import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.view.LineChartView;
 
 
-public class DetailGraphActivity extends Activity {
+public class DetailGraphActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener {
 
+    private static final int CURSOR_LOADER_ID = 101;
 
     private String mSymbol;
 
@@ -53,6 +66,12 @@ public class DetailGraphActivity extends Activity {
     LineChartView mChart;
     @BindView(R.id.stock_change)
     TextView mChange;
+    @BindView(R.id.swipe_layout)
+    SwipeRefreshLayout swipeLayout;
+    @BindView(R.id.empty_text)
+    TextView emptyTextView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
 
     @Override
@@ -60,10 +79,18 @@ public class DetailGraphActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_graph);
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         mSymbol = getIntent().getStringExtra("symbol");
 
         fetchStockHistory();
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+
+        swipeLayout.setOnRefreshListener(this);
     }
 
 
@@ -90,7 +117,7 @@ public class DetailGraphActivity extends Activity {
 
         String QUERY_URL = "https://query.yahooapis.com/v1/public/yql?" +
                 "format=json&diagnostics=true&" +
-                "env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=" + "&"+query;
+                "env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=" + "&" + query;
 
 
         Request request = new Request.Builder()
@@ -110,9 +137,9 @@ public class DetailGraphActivity extends Activity {
 
                     try {
                         JSONObject responseObject = new JSONObject(responseString);
-                        JSONObject query= responseObject.getJSONObject("query");
-                        JSONObject results= query.getJSONObject("results");
-                        final JSONArray quote= results.getJSONArray("quote");
+                        JSONObject query = responseObject.getJSONObject("query");
+                        JSONObject results = query.getJSONObject("results");
+                        final JSONArray quote = results.getJSONArray("quote");
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -128,37 +155,6 @@ public class DetailGraphActivity extends Activity {
                         e.printStackTrace();
                     }
 
-
-                    /*try {
-                        // Trim response string
-                        String result = response.body().string();
-                        if (result.startsWith("finance_charts_json_callback( ")) {
-                            result = result.substring(29, result.length() - 2);
-                        }
-
-                        // Parse JSON
-                        JSONObject object = new JSONObject(result);
-                        String companyName = object.getJSONObject("meta").getString("Company-Name");
-                        if (companyName != null) {
-                            name.setText(companyName);
-                        }
-                        List<String> labels = new ArrayList<>();
-                        List<Float> values = new ArrayList<>();
-                        JSONArray series = object.getJSONArray("series");
-                        for (int i = 0; i < series.length(); i++) {
-                            JSONObject seriesItem = series.getJSONObject(i);
-                            SimpleDateFormat srcFormat = new SimpleDateFormat("yyyyMMdd");
-                            SimpleDateFormat destFormat = new SimpleDateFormat("dd MMM");
-                            String date = destFormat.format(srcFormat.parse(seriesItem.getString("Date")));
-                            labels.add(date);
-                            values.add(Float.parseFloat(seriesItem.getString("close")));
-                        }
-
-                        onDownloadCompleted(labels, values);
-                    } catch (Exception e) {
-                        onDownloadFailed();
-                        e.printStackTrace();
-                    }*/
                 } else {
                     onDownloadFailed();
                 }
@@ -168,26 +164,31 @@ public class DetailGraphActivity extends Activity {
     }
 
     private void onDownloadFailed() {
-
+        onRefreshComlete();
+        emptyTextView.setVisibility(View.VISIBLE);
+        mChart.setVisibility(View.GONE);
     }
 
-    private void onDownloadCompleted(List<String> labels, List<Float> values) {
-
+    private void onDownloadSuccess() {
+        onRefreshComlete();
+        emptyTextView.setVisibility(View.GONE);
+        mChart.setVisibility(View.VISIBLE);
     }
+
 
     private void updateChart(JSONArray results) throws JSONException {
+        onDownloadSuccess();
 
         List<AxisValue> axisValuesX = new ArrayList<>();
         List<PointValue> pointValues = new ArrayList<>();
 
 
-        for(int counter=0;counter<results.length();counter++) {
+        for (int counter = 0; counter < results.length(); counter++) {
             JSONObject data = results.getJSONObject(counter);
             String date = data.getString("Date");
             String bidPrice = data.getString("Close");
 
 
-            // We have to show chart in right order.
             int x = results.length() - 1 - counter;
 
             // Point for line chart (date, price).
@@ -196,7 +197,7 @@ public class DetailGraphActivity extends Activity {
             pointValues.add(pointValue);
 
             // Set labels for x-axis (we have to reduce its number to avoid overlapping text).
-            if (counter != 0 && counter % (data.length() / 3) == 0) {
+            if (counter != 0 && counter % (results.length() / 3) == 0) {
                 AxisValue axisValueX = new AxisValue(x);
                 axisValueX.setLabel(date);
                 axisValuesX.add(axisValueX);
@@ -229,6 +230,7 @@ public class DetailGraphActivity extends Activity {
 
         // Show chart
         mChart.setVisibility(View.VISIBLE);
+
     }
 
 
@@ -245,4 +247,49 @@ public class DetailGraphActivity extends Activity {
         return max;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(this, QuoteProvider.Quotes.CONTENT_URI,
+                new String[]{QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE, QuoteColumns.NAME,
+                        QuoteColumns.PERCENT_CHANGE, QuoteColumns.CHANGE, QuoteColumns.ISUP},
+                QuoteColumns.SYMBOL + " = ?",
+                new String[]{mSymbol},
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        setCurrentDataUI(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    private void setCurrentDataUI(Cursor cursor) {
+        if (!cursor.moveToFirst()) {
+            return;
+        }
+        String symbol = cursor.getString(cursor.getColumnIndex("symbol"));
+        String name = cursor.getString(cursor.getColumnIndex("name"));
+        String bid_price = cursor.getString(cursor.getColumnIndex("bid_price"));
+        String p_change = cursor.getString(cursor.getColumnIndex("percent_change"));
+        String change = cursor.getString(cursor.getColumnIndex("change"));
+
+        mNameView.setText(name);
+        toolbar.setTitle(name);
+        mSymbolView.setText(symbol);
+        mEbitdaView.setText(bid_price);
+        mChange.setText(String.format("%s(%s)", change, p_change));
+    }
+
+    @Override
+    public void onRefresh() {
+        fetchStockHistory();
+    }
+
+    private void onRefreshComlete() {
+        swipeLayout.setRefreshing(false);
+    }
 }

@@ -2,79 +2,113 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
-
-
-        <lecho.lib.hellocharts.view.LineChartView
-            android:id="@+id/stock_chart"
-            android:layout_width="match_parent"
-            android:layout_height="240dp"
-            android:padding="@dimen/padding_normal"
-            android:visibility="invisible" />
-
-    <android.support.v7.widget.GridLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/material_blue_500"
-        android:paddingEnd="@dimen/material_default_padding"
-        android:paddingLeft="@dimen/material_default_padding"
-        android:paddingRight="@dimen/material_default_padding"
-        android:paddingStart="@dimen/material_default_padding"
-        app:columnCount="2">
+        android:background="?colorPrimary"
+        android:minHeight="?attr/actionBarSize" />
 
-        <TextView
-            android:id="@+id/stock_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_columnSpan="2"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/stock_symbol"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/padding_small"
-            android:textAllCaps="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_columnSpan="2"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/material_default_padding"
-            app:layout_columnSpan="2"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1">
+            <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/stock_bidprice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start|center_vertical"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                android:textSize="@dimen/bidprice_text_size" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="240dp">
 
-            <TextView
-                android:id="@+id/stock_change"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/stock_bidprice"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textStyle="bold"
-                tools:ignore="RelativeOverlap" />
+                    <lecho.lib.hellocharts.view.LineChartView
+                        android:id="@+id/stock_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/padding_normal"
+                        android:visibility="invisible" />
 
-        </RelativeLayout>
+                    <TextView
+                        android:id="@+id/empty_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/not_found" />
+                </FrameLayout>
 
-    </android.support.v7.widget.GridLayout>
+                <android.support.v7.widget.GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/material_blue_500"
+                    android:paddingEnd="@dimen/material_default_padding"
+                    android:paddingLeft="@dimen/material_default_padding"
+                    android:paddingRight="@dimen/material_default_padding"
+                    android:paddingStart="@dimen/material_default_padding"
+                    android:paddingTop="@dimen/activity_vertical_margin"
+                    app:columnCount="2">
+
+                    <TextView
+                        android:id="@+id/stock_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                        app:layout_columnSpan="2"
+                        app:layout_columnWeight="1"
+                        app:layout_rowWeight="1" />
+
+                    <TextView
+                        android:id="@+id/stock_symbol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/padding_small"
+                        android:textAllCaps="true"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        app:layout_columnSpan="2"
+                        app:layout_columnWeight="1"
+                        app:layout_rowWeight="1" />
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/material_default_padding"
+                        app:layout_columnSpan="2"
+                        app:layout_columnWeight="1"
+                        app:layout_rowWeight="1">
+
+                        <TextView
+                            android:id="@+id/stock_bidprice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="start|center_vertical"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                            android:textSize="@dimen/bidprice_text_size" />
+
+                        <TextView
+                            android:id="@+id/stock_change"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBaseline="@+id/stock_bidprice"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                            android:textStyle="bold"
+                            tools:ignore="RelativeOverlap" />
+
+                    </RelativeLayout>
+
+                </android.support.v7.widget.GridLayout>
 
 
+            </LinearLayout>
+        </ScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>
