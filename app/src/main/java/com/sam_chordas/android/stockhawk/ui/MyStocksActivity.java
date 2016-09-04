@@ -292,6 +292,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     if (!isConnected && mCursorAdapter.getItemCount() > 0) {
       Toast.makeText(this, R.string.no_network_stock_outofdate, Toast.LENGTH_SHORT).show();
     }
+    if (!isConnected) {
+      mEmptyTextView.setText(R.string.no_network_available);
+    }
   }
 
   @Override
