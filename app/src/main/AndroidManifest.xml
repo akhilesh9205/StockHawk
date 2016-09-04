@@ -62,7 +62,7 @@
             android:name=".ui.DetailGraphActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".ui.MyStocksActivity"
-            android:label="@string/title_activity_detail_graph"/>
+            />
     </application>
 
 </manifest>
