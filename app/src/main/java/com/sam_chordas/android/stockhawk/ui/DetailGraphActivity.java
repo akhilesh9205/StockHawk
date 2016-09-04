@@ -91,6 +91,7 @@ public class DetailGraphActivity extends AppCompatActivity implements LoaderMana
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         swipeLayout.setOnRefreshListener(this);
+        emptyTextView.setText(R.string.loading);
     }
 
 
@@ -166,6 +167,7 @@ public class DetailGraphActivity extends AppCompatActivity implements LoaderMana
     private void onDownloadFailed() {
         onRefreshComlete();
         emptyTextView.setVisibility(View.VISIBLE);
+        emptyTextView.setText(R.string.not_found);
         mChart.setVisibility(View.GONE);
     }
 

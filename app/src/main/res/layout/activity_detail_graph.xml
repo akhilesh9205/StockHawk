@@ -16,39 +16,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
-            <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
+        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="240dp">
+
+                <lecho.lib.hellocharts.view.LineChartView
+                    android:id="@+id/stock_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/padding_normal"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/empty_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/not_found" />
+            </FrameLayout>
+
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="240dp">
-
-                    <lecho.lib.hellocharts.view.LineChartView
-                        android:id="@+id/stock_chart"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:padding="@dimen/padding_normal"
-                        android:visibility="invisible" />
-
-                    <TextView
-                        android:id="@+id/empty_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="@string/not_found" />
-                </FrameLayout>
+                android:background="@color/material_blue_500">
 
                 <android.support.v7.widget.GridLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/material_blue_500"
                     android:paddingEnd="@dimen/material_default_padding"
                     android:paddingLeft="@dimen/material_default_padding"
                     android:paddingRight="@dimen/material_default_padding"
@@ -106,9 +107,10 @@
                     </RelativeLayout>
 
                 </android.support.v7.widget.GridLayout>
+            </FrameLayout>
 
 
-            </LinearLayout>
-        </ScrollView>
+        </LinearLayout>
+
     </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>
